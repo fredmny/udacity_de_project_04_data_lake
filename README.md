@@ -23,5 +23,8 @@ The final tables are in the star schema, making it easy to aggregate data on the
 The project consists of following files:
 - `etl.py` - Transforms the data contained in the `json` files and saves this data as `parquet` files
 - `example_dl.cfg` - Must be saved as `dl.cfg` and then be filled with AWS credential.
+- `data/` - Example datasets
 ## Dependencies
 All required dependencies are saved in the `pyproject.toml` / `poetry.lock` files. To install them create a virtual environment with Poetry ([link](https://python-poetry.org/))
+## References
+The project is based on the initial project files and used the guidance provided by the Udacity Data Engineering Nanodegree.
