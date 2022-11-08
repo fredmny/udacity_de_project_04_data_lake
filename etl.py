@@ -15,6 +15,11 @@ os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['AWS_SECRET_ACCESS_KEY']
 
 
 def create_spark_session():
+    """Creates a Spark Session with the necessary AWS parameters
+
+    Returns:
+        Spark session object
+    """
     spark = SparkSession \
         .builder \
         .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
@@ -23,6 +28,17 @@ def create_spark_session():
 
 
 def process_song_data(spark, input_data, output_data):
+    """Creates the tables based solely on the song dataset:
+        - songs
+        - artists
+
+    Args:
+        spark (Spark session): The Spark session
+        input_data (str): The bucket/folder where the input data
+        is saved
+        output_data (str): The bucket/folder where the output data
+        should be saved
+    """
     # get filepath to song data file
     song_data = os.path.join(input_data, "song_data/*/*/*/*.json")
     
@@ -55,6 +71,18 @@ def process_song_data(spark, input_data, output_data):
 
 
 def process_log_data(spark, input_data, output_data):
+    """Creates all tables based on the log dataset:
+        - users
+        - time
+        - songplays
+
+    Args:
+        spark (Spark session): The Spark session
+        input_data (str): The bucket/folder where the input data
+        is saved
+        output_data (str): The bucket/folder where the output data
+        should be saved
+    """
     # get filepath to log data file
     log_data = os.path.join(input_data, "log_data/2018/11/*.json")
 
@@ -112,8 +140,10 @@ def process_log_data(spark, input_data, output_data):
         time_table,
         df.timestamp == time_table.start_time,
         "left"
-)
-    # extract columns from joined song and log datasets to create songplays table 
+    )
+    
+    # extract columns from joined song and log datasets 
+    # to create songplays table 
     songplays_table = df_joined.selectExpr(
         "start_time",
         "userId AS user_id",
@@ -127,18 +157,25 @@ def process_log_data(spark, input_data, output_data):
         "month"
     )
 
-    # write songplays table to parquet files partitioned by year and month
+    # write songplays table to parquet files 
+    # partitioned by year and month
     songplays_table.write.partitionBy("year", "month")\
         .parquet(os.path.join(output_data, 'songplays'))
 
 
 def main():
+    """Main function. Executes following steps:
+        - Creates a Spark session
+        - Processes the song dataset and creates related tables
+        - Processes the log dataset and creates related tables
+    """
     spark = create_spark_session()
     input_data = "s3a://udacity-dend/"
     output_data = "s3a://sparkify-project4-output/"
     
     process_song_data(spark, input_data, output_data)    
     process_log_data(spark, input_data, output_data)
+
 
 if __name__ == "__main__":
     main()
